@@ -30,7 +30,8 @@ public class ClienteController {
 	@GetMapping("/clientes/{clienteId}")
 	public ResponseEntity<Cliente> buscar(@PathVariable Long clienteId) {
 		return clienteRepository.findById(clienteId)
-				.map(cliente -> ResponseEntity.ok(cliente))
+//				.map(cliente -> ResponseEntity.ok(cliente))
+				.map(ResponseEntity::ok)
 				.orElse(ResponseEntity.notFound().build());
 		
 //		Optional<Cliente> cliente = clienteRepository.findById(clienteId);
