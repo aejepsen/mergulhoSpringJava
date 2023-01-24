@@ -22,6 +22,7 @@ import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
 import com.algaworks.algalog.domain.ValidationGroups;
+import com.algaworks.algalog.domain.exception.NegocioException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
@@ -40,17 +41,17 @@ public class Entrega {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Valid
-	@ConvertGroup(from = Default.class, to = ValidationGroups.ClienteId.class)
-	@NotNull
+//	@Valid
+//	@ConvertGroup(from = Default.class, to = ValidationGroups.ClienteId.class)
+//	@NotNull
 	@ManyToOne
 	private Cliente cliente;
 	
-	@Valid
+//	@Valid
 	@Embedded
 	private Destinatario destinatario;
 	
-	@NotNull
+//	@NotNull
 	private BigDecimal taxa;
 	
 	@OneToMany(mappedBy = "entrega", cascade = CascadeType.ALL)
@@ -71,6 +72,24 @@ public class Entrega {
 		
 		this.getOcorrencias().add(ocorrencia);
 		return ocorrencia;
+	}
+
+	public void finalizar() {
+		if (naoPodeSerFinalizada()) {
+			throw new NegocioException("Entrega não pode ser finalizada");
+		}
+		
+		setStatus(StatusEntrega.FINALIZADA);
+		setDataFinalizacao(OffsetDateTime.now());
+		
+	}
+	
+	public boolean podeSerFinalizada() {
+		return StatusEntrega.PENDENTE.equals(getStatus());
+	}
+	
+	public boolean naoPodeSerFinalizada() {
+		return !podeSerFinalizada();
 	}
 	
 }
